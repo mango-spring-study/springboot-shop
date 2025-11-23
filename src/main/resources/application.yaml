@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: shop
+  profiles:
+    default: dev # 아무 프로파일도 안 주면 dev 사용
+
+logging:
+  level:
+    "[org.hibernate.SQL]": debug
+    "[org.hibernate.orm.jdbc.bind]": trace

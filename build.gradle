@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.0'
+    id 'io.spring.dependency-management' version '1.1.7'
+    // 나중에 GraalVM Native Image 쓸 때:
+    // id 'org.graalvm.buildtools.native' version '0.11.3'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+description = 'Shop backend with Spring Boot 4 + Java 25'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // --- 애플리케이션 핵심 ---
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // --- 로깅/모니터링 (1차: Actuator) ---
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // (나중에 Prometheus/OpenTelemetry 붙일 때 추가:
+    // implementation 'org.springframework.boot:spring-boot-starter-opentelemetry')
+
+    // --- 캐시 (2단계: Caffeine → 3단계: Redis) ---
+    implementation 'org.springframework.boot:spring-boot-starter-cache'       // Spring Cache 추상화
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.2.3'            // Caffeine 캐시 구현체
+    // Redis 단계에서:
+    // implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // --- DB 드라이버 ---
+    runtimeOnly 'com.h2database:h2'                    // 개발/테스트용
+    // 나중에 MySQL 사용할 때:
+    // runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // --- 개발 편의 / Lombok ---
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // --- 테스트 (Boot 4 모듈화 된 test 스타터들) ---
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    // (필요하면 공통 테스트 유틸용)
+    // testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
